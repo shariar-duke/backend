@@ -2,17 +2,24 @@ const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
 
+const userRouter = require("./routes/userRouter")  // user Router k import kore nia aslam 
 
 const app = express()
 
-app.use(express.json()) // ei middleware tar kaj hosche post method a data k jno json a convert kore felte apre 
+app.use(express.json())
 
 app.use(cors)
 
 if (process.env.NODE_ENV === "development") {
-    // amra jode application ta development a chalai tahole amra chache j amra ki ki request kokhn kortse ogula amader console.log a dekhak that's it 
+
     app.use(morgan('dev'))
 }
 
+app.use('/api/user', userRouter)
+
 
 module.exports = app;
+
+
+// ekhnae duta kaj holo ekta holo userRouter k amra call kore anlam
+// Then amra jode localhost:3001/api/user ei porjonto type kore tahle amader sob kisu userRouter er modhe gia khoja suru hbe thtat's it 
