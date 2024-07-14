@@ -2,14 +2,6 @@
 const express = require('express')
 const router = express.Router() // router k import korlam 
 
-const signUp = () => {
-
-}
-
-const signIn = () => {
-
-}
-
 router.route('/signup').post(signUp)
 router.route('/signin').post(signIn)
 
