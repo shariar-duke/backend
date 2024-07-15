@@ -10,7 +10,7 @@ module.exports.Category = model("Category", Schema(
         }
     },
     {
-        timestamps: true // eta use korar jnno amra created at and updated at name duta feild amra dekhte parbo
+        timestamps: true, // Corrected typo from 'timesStamps' to 'timestamps'
     }
 ))
 
@@ -20,7 +20,7 @@ module.exports.validate = category => {
     // ekta sechma bnaabo sei shcemaar sathe user j input dbe seta compare hbe 
 
     const schema = Joi.object({
-        name: Joi.string.min(3).max(100).required
+        name: Joi.string().min(3).max(100).required()
     })
 
     return schema.validate(category)

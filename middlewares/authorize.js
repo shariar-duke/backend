@@ -15,22 +15,28 @@ module.exports = async function (req, res, next) {
         token = token.split(" ")[1].trim()   // Bearer mytoken eita pura ta ekta string er modhe to space thake eta k space er upor depend kore vag korte hbe . trim ta suru r ses er j psace
         // pabe seta k remove kore felbe . So token er modhe gelo 1 index a jeta thake I mean sudhu token ta 
 
-        const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY)
+        try {
+            const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY)
+            req.user = decoded
+        } catch (err) {
+            if (!decoded) {
+                return res.status(400).send("Invalid Token")
+            }
+        }
+
 
         // decode korar jnno vai amader jwt er help nite hbe karon ei token banaise . ei decode kroe er modhe ki ase seta bole dibe 
 
         // jode decode korte na pare 
 
-        if (!decoded) {
-            return res.status(400).send("Invalid Token")
-        }
+
 
         // jode token ta varify korte partse 
 
         // req kinut ekta object er modhe new property set kroe taar value diye dawa jay . req er modhe header o ekta property cilo jkhne thke ami token ta tullam
         // ekhn req er modhe ami ekta new property set korbo jar name holo user and ter modhe ami decoded howa information gula rakhbo 
 
-        req.user = decoded
+
 
         next() // eta ekta middleware tai next function ta obossoi call kore dite hbe 
     }
