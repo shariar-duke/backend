@@ -35,7 +35,7 @@ const userSchema = Schema({
 },
 
     {
-        timesStamps: true
+        timestamps: true
     }
 )
 
