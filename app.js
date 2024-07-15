@@ -8,7 +8,8 @@ const app = express()
 
 app.use(express.json())
 
-app.use(cors)
+app.use(cors()); // Call the middleware function
+
 
 if (process.env.NODE_ENV === "development") {
 

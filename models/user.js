@@ -10,7 +10,7 @@ const userSchema = Schema({
         type: String,
         required: true,
         minlength: 3,
-        maxlenght: 100
+        maxlength: 100
     },
     email: {
         type: String,
@@ -23,7 +23,7 @@ const userSchema = Schema({
         type: String,
         required: true,
         minlength: 5,
-        maxlenghth: 2024
+        maxlength: 2024
 
     },
     role: {
