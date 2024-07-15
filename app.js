@@ -5,6 +5,7 @@ const morgan = require('morgan')
 
 const userRouter = require("./routes/userRouter")
 const categoryRouter = require("./routes/categoryRouter")
+const productRouter = require("./routes/productRouter")
 
 const app = express()
 
@@ -20,6 +21,7 @@ if (process.env.NODE_ENV === "development") {
 
 app.use('/api/user', userRouter)
 app.use('/api/category', categoryRouter)
+app.use('api/product', productRouter)
 
 
 app.use((err, req, res, next) => {
