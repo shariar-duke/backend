@@ -32,21 +32,20 @@ const signUp = async (req, res) => {
 
 
 
-    try {
-        const result = await user.save()
 
-        return res.status(201).send({
-            message: "Registration Successful",
-            token: token,
+    const result = await user.save()
 
-            user: _.pick(result, ["_id", "name", "email"])
+    return res.status(201).send({
+        message: "Registration Successful",
+        token: token,
 
-        })
-    } catch (error) {
+        user: _.pick(result, ["_id", "name", "email"])
+
+    })
 
 
-        return res.status(500).send("Something Failed")
-    }
+
+
 
 }
 
@@ -63,8 +62,6 @@ const signIn = async (req, res) => {
     if (!validateUser) {
         return res.status(400).send("Invalid email or password")
     }
-
-
 
     const token = user.generateJWT()
 
