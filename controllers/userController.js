@@ -54,4 +54,26 @@ export const signUp = async (req, res) => {
 
 export const signIn = async (req, res) => {
 
+    // signin er bapar a policy ta khub simple age dekhbe ei emai ta exists kreo naki . jode na kore kahini ses. r jdoe kroe tahle dekhbo ei email er against a j password ta save
+    // ase db te otar sathe ami j password ta dilam ota milay dekhbo j milse naki mille sigin kora possible 
+    let user = await User.findOne({ email: req.body.email })
+    if (!user) {
+        return res.status(400).send("Invalid email or password")
+    }
+    // jode ei emial pawa jay ekhn check korbo ei email  er sathe ei passwod ta mile naki 
+
+    const validateUser = await bcrypt.compare(req.body.password, user.password)
+    if (!validateUser) {
+        return res.status(400).send("Invalid email or password")
+    }
+
+    // er opr successfully login korte parle token return korbe 
+
+    const token = user.generateJWT()
+
+    return res.status(200).send({
+        message: "Login  Successful",
+        token: token,
+        user: _.pick(user, ["_id", "name", "email"])
+    })
 }
