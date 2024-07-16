@@ -1,80 +1,108 @@
-const _ = require('lodash')
-const { Product, validate } = require('../models/product')
-const formidable = require('formidable') // formidablle package take install korlam 
-const fs = require("fs") // node er default file read kroar system keo import kore anlam 
+const _ = require('lodash');
+const formidable = require('formidable');
+const fs = require('fs');
+const { Product, validate } = require('../models/product');
 
-module.exports.createProduct = async (req, res) => {
+module.exports.createProduct = (req, res) => {
+    let form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.parse(req, (err, fields) => {
+        if (err) return res.status(400).send("Something went wrong!");
 
-    const form = new formidable.IncomingForm() // j form ta kore amader kase data asbe tar kas theke data niye ei form er modhe rakhe dbe 
-    form.keepExtensions = true; // ekhne boltse j amader file a jode data ase thake tahle j data gula aslo se extension gula ami rakhe dbo 
+        // Convert fields to the appropriate types and ensure they are strings
+        const processedFields = {
+            name: String(fields.name),
+            description: String(fields.description),
+            price: parseFloat(fields.price),
+            category: String(fields.category),
+            quantity: parseInt(fields.quantity, 10)
+        };
 
-    form.parse(req, (err, feilds, files) =>  // form parse amader ei post req ta nibe , niey ekta call back function call kore dibe 
-    {
-        if (err) {
-            return res.status(400).send("Something Went Wrong");
+        // Validate the fields
+        const { error } = validate(processedFields);
+        if (error) return res.status(400).send(error.details[0].message);
 
-        } // eta te check korlam form theke data gula thik vbe asche naki
-
-        // ekhn check korbo holo j data gula asche ogula validation pass kore naki 
-
-        const { error } = validate(_.pick(feilds, ["name", "description", "price", "category", "quantity"]))
-        // age egula asto holo req.body theke ekhn e gula asbe holo feilds theke , feild a eka ekta proprty thakbe 
-
-        if (error) {
-            // jode validation a fail khay . product er data jmn howar kotha cilo tmn na hoye thake then 
-            return res.status(400).send(error.details[0].message)
-        }
-
-        // form a data asche naki sei validation jode par kore thake and also j data gula asche ogula amar validate datar sathe mile naki seta par korar por eta db te save kroe 
-        // dbo
-
-        const product = new Product(feilds) // karon feilds ero sob key value akarei thakbe 
-
-        // ekhn check korbo photo asbe ki na. photo asbe holo files er vitore . normal object asbe holo feilds er vitore but photo asbe holo files er vitore eta k onno vbe handle
-        // korte hbe 
-
-        if (feilds.photo) // input type = "file" name ="photo"
-        {
-            fs.readFile(files.photo.path, (err, data) => {
-                if (err) {
-                    return res.status(400).send("Problem in file data")
-
-                }
-
-                product.photo.data = data;
-                product.photo.contentType = files.photo.type;
-                product.save((err, result) => {
-                    if (err) {
-                        res.status(500).send("Internal Server error")
-                    }
-
-                    else {
-                        return res.status(201).send({
-                            message: "Product created successully",
-                            data: _.pick(result, ["name", "description", "price", "category", "quantity"])
-                        })
-                    }
-                })
+        const product = new Product(processedFields);
+        product.save()
+            .then(result => {
+                return res.status(201).send({
+                    message: "Product Created Successfully!",
+                    data: _.pick(result, ["name", "description", "price", "category", "quantity"])
+                });
             })
-        }
-
-        // if (feilds.photo) eta jode fail hoy tar mane se kno photo provide kore nai so amar ekhn amar jeta kote hbe seta holo 
-
-        else {
-            return res.status(400).send("No Image Provided")
-        }
-
-    })
+            .catch(err => {
+                return res.status(500).send("Internal Server error!");
+            });
+    });
 }
 
+// Query String
+// api/product?order=desc&sortBy=name&limit=10
 module.exports.getProducts = async (req, res) => {
-
+    let order = req.query.order === 'desc' ? -1 : 1;
+    let sortBy = req.query.sortBy ? req.query.sortBy : '_id';
+    let limit = req.query.limit ? parseInt(req.query.limit) : 10;
+    const products = await Product.find()
+        .select({ photo: 0 })
+        .sort({ [sortBy]: order })
+        .limit(limit)
+        .populate('category', 'name');
+    return res.status(200).send(products);
 }
 
 module.exports.getProductById = async (req, res) => {
-
+    const productId = req.params.id;
+    const product = await Product.findById(productId)
+        .select({ photo: 0 })
+        .populate('category', 'name');
+    if (!product) res.status(404).send("Not Found!");
+    return res.status(200).send(product);
 }
 
+module.exports.getPhoto = async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId)
+        .select({ photo: 1, _id: 0 })
+    res.set('Content-Type', product.photo.contentType);
+    return res.status(200).send(product.photo.data);
+}
+
+// Get Product by Id
+// Collect form data
+// Update Provied Form Fields
+// Update photo (If Provided)
 module.exports.updateProductById = async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    let form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.parse(req, (err, fields, files) => {
+        if (err) return res.status(400).send("Something wrong!");
+        const updatedFields = _.pick(fields, ["name", "description", "price", "category", "quantity"]);
+        _.assignIn(product, updatedFields);
 
+        if (files.photo) {
+            fs.readFile(files.photo.path, (err, data) => {
+                if (err) return res.status(400).send("Something wrong!");
+                product.photo.data = data;
+                product.photo.contentType = files.photo.type;
+                product.save((err, result) => {
+                    if (err) return res.status(500).send("Something failed!");
+                    else return res.status(200).send({
+                        message: "Product Updated Successfully!"
+                    })
+                })
+            })
+        } else {
+            product.save((err, result) => {
+                if (err) return res.status(500).send("Something failed!");
+                else return res.status(200).send({
+                    message: "Product Updated Successfully!"
+                })
+            })
+        }
+    })
 }
+
+
+

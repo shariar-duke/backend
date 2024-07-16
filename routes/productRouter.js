@@ -1,14 +1,23 @@
-const express = require('express')
-const router = express.Router() // router k import korlam 
-const admin = require('../middlewares/admin')
-const authorize = require('../middlewares/authorize')
-const { createProduct, getProducts, getProductById, updateProductById } = require('../controllers/productController')
+const router = require('express').Router();
+const {
+    getProducts,
+    createProduct,
+    getProductById,
+    updateProductById,
+    getPhoto
+} = require('../controllers/productController');
+const admin = require('../middlewares/admin');
+const authorize = require('../middlewares/authorize');
 
+router.route('/')
+    .post([authorize, admin], createProduct)
+    .get(getProducts);
 
-router.route('/').post([authorize, admin], createProduct).get(getProducts) // ei duta base url a hbe 
+router.route('/:id')
+    .get(getProductById)
+    .put([authorize, admin], updateProductById);
 
-// single prouct pawar jnno and single product update er jnno of course ekta single id send korte hbe seta ami kortse ekhn
+router.route('/photo/:id')
+    .get(getPhoto);
 
-router.route('/:id').get(getProductById).put(updateProductById)
-
-module.exports = router
+module.exports = router;
