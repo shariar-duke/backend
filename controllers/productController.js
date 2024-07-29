@@ -137,6 +137,27 @@ module.exports.filterProducts = async (req, res) => {
     let sortBy = req.body.sortBy ? req.body.sortBy : '_id';
     let limit = req.body.limit ? parseInt(req.body.limit) : 10;
     let skip = parseInt(req.body.skip)
+    // filters object take collect korbo karon er modhe sob thakbe ..
+    let filters = req.body.filters
+    let args = {}
+    // ekta empty object crete krobo
+    for (let key in filters) {
+        if (filters[key].length > 0) {
+            if (key === "price") {
+                args['price'] = {
+                    $gte: filters['price'][0],
+                    $lte: filters['price'][1] // Assuming filters['price'] is an array with two elements [minPrice, maxPrice]
+                };
+                console.log(args)
+            }
+            if (key === "category") {
+                args['category'] = {
+                    $in: filters['category'] // Assuming filters['category'] is an array of categories
+                };
+            }
+        }
+    }
+
     const products = await Product.find().select({ photo: 0 }).populate('category', 'name').sort({ [sortBy]: order }).skip(skip).limit(limit)
     return res.status(200).send(products)
 }

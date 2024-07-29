@@ -4,6 +4,7 @@ const {
     createProduct,
     getProductById,
     updateProductById,
+    filterProducts,
     getPhoto
 } = require('../controllers/productController');
 const admin = require('../middlewares/admin');
