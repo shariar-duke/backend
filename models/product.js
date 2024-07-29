@@ -15,11 +15,11 @@ module.exports.Product = model('Product', Schema({
 
 module.exports.validate = product => {
     const schema = Joi.object({
-        name: Joi.string().min(3).max(255).required(),
-        description: Joi.string().max(2000).required(),
-        price: Joi.number().required(),
-        quantity: Joi.number().required(),
-        category: Joi.string().required(),
+        name: Joi.string().min(3).max(255),
+        description: Joi.string().max(2000),
+        price: Joi.number(),
+        quantity: Joi.number(),
+        category: Joi.string(),
     });
     return schema.validate(product);
 }
