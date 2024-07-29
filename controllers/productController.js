@@ -158,7 +158,7 @@ module.exports.filterProducts = async (req, res) => {
         }
     }
 
-    const products = await Product.find().select({ photo: 0 }).populate('category', 'name').sort({ [sortBy]: order }).skip(skip).limit(limit)
+    const products = await Product.find(args).select({ photo: 0 }).populate('category', 'name').sort({ [sortBy]: order }).skip(skip).limit(limit)
     return res.status(200).send(products)
 }
 
