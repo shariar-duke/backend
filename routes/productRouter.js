@@ -20,4 +20,6 @@ router.route('/:id')
 router.route('/photo/:id')
     .get(getPhoto);
 
+router.route('/filter').post(filterProducts)
+
 module.exports = router;
