@@ -1,37 +1,17 @@
 require('express-async-errors')
 const express = require('express')
-const cors = require('cors')
-const morgan = require('morgan')
-
-const userRouter = require("./routes/userRouter")
-const categoryRouter = require("./routes/categoryRouter")
-const productRouter = require("./routes/productRouter")
-
+const md = require('./middlewares') // eta k middleware er index.js theke nia aslam..
+const routeMd = require('./middlewares/routes') //
 const app = express()
-
-app.use(express.json())
-
-app.use(cors());
-
-
-if (process.env.NODE_ENV === "development") {
-
-    app.use(morgan('dev'))
-}
-
-app.use('/api/user', userRouter)
-app.use('/api/category', categoryRouter)
-app.use('/api/product', productRouter)
-
+// eta holo default middleware er jnno 
+md(app)
+// app middleware r jnno r ekta lekhbo
+routeMd(app)
 
 app.use((err, req, res, next) => {
     return res.status(500).send("Something Failed")
 })
 
-
-
-
 module.exports = app;
 
 
-console.log("This is ranodm commit")
