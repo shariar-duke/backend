@@ -1,6 +1,7 @@
 const userRouter = require("../routes/userRouter")
 const categoryRouter = require("../routes/categoryRouter")
 const productRouter = require("../routes/productRouter")
+const cartRouter = require("../routes/cartRouter.js")
 // app.js theke joto routes ase sob gula k ekhne nia aslam..
 
 // ei file theke ekta function amra export kore dibo 
@@ -9,4 +10,5 @@ module.exports = (app) => {
     app.use('/api/user', userRouter)
     app.use('/api/category', categoryRouter)
     app.use('/api/product', productRouter)
+    app.use('/api/cart', cartRouter)
 }
