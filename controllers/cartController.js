@@ -65,4 +65,11 @@ module.exports.updateCartItem = async (req, res) => {
 
 module.exports.deleteCartItem = async (req, res) => {
 
+    const _id = req.params.id;
+    const userId = req.user._id;
+    await CartItem.deleteOne({ _id: _id, user: userId })  // delete korte hole product er id tao match hote hbe and j user logged in ase tar id o match hote hbe 
+    // otehrwise ekjon logged in user onno logged in user er product delete kore dite parbe.
+
+    return res.status(200).send("Deleted")
+
 }
