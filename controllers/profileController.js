@@ -4,6 +4,8 @@ const { Profile } = require("../models/profile")
 
 module.exports.getProfile = async (req, res) => {
 
+    const userId = req.user.id;
+
 }
 
 
