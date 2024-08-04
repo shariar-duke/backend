@@ -40,12 +40,25 @@ module.exports.createCartItem = async (req, res) => {
 // eta cartItem gula k get korabe 
 module.exports.getCartItem = async (req, res) => {
 
+    const cartItems = await CartItem.find({
+        user: req.user.id
+    }).populate('product', 'name').populate('user', 'name');
+
+    return res.status(200).send(cartItems)
+
 }
 
 // eta cartTIem gula k update korabe ...
 
 module.exports.updateCartItem = async (req, res) => {
+    // ekhne ami expect krtse j cart item ta update korbo tar id ta asbe tarpor ekhn j koyta item add korse tar theke ek besi add hye asbe 
 
+    const { _id, count } = _.pick(req.body, ["count", "_id"])
+    const userId = req.user._id;
+
+    await CartItem.updateOne({ _id: _id, user: userId }, { count: count })
+
+    return res.status(200).send("Item updated successfully")
 }
 
 // cart er kno item delete kore dite chaile eta korte hbe 
